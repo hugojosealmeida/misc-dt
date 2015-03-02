@@ -1,0 +1,6 @@
+build/
+*.o
+*.gcda
+*.gcno
+*.gcov
+.DS_Store
