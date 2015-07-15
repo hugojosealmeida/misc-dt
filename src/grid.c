@@ -48,3 +48,25 @@ void grid_clear(grid *g)
     memset(g->cells, 0, (size_t)g->width * (size_t)g->height);
 }
 
+bool grid_in_bounds(const grid *g, int x, int y)
+{
+    return g != NULL && x >= 0 && y >= 0 && x < g->width && y < g->height;
+}
+
+bool grid_get(const grid *g, int x, int y)
+{
+    if (!grid_in_bounds(g, x, y)) {
+        return false;
+    }
+    return g->cells[(size_t)y * (size_t)g->width + (size_t)x] != 0;
+}
+
+bool grid_set(grid *g, int x, int y, bool alive)
+{
+    if (!grid_in_bounds(g, x, y)) {
+        return false;
+    }
+    g->cells[(size_t)y * (size_t)g->width + (size_t)x] = alive ? 1 : 0;
+    return true;
+}
+
