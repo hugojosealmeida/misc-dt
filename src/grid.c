@@ -70,3 +70,60 @@ bool grid_set(grid *g, int x, int y, bool alive)
     return true;
 }
 
+int grid_count_alive(const grid *g)
+{
+    if (g == NULL) {
+        return 0;
+    }
+
+    int alive = 0;
+    size_t count = (size_t)g->width * (size_t)g->height;
+    for (size_t i = 0; i < count; ++i) {
+        alive += g->cells[i] != 0;
+    }
+    return alive;
+}
+
+bool grid_copy(grid *dst, const grid *src)
+{
+    if (dst == NULL || src == NULL) {
+        return false;
+    }
+    if (dst->width != src->width || dst->height != src->height) {
+        return false;
+    }
+
+    memcpy(dst->cells, src->cells, (size_t)src->width * (size_t)src->height);
+    return true;
+}
+
+bool grid_equals(const grid *a, const grid *b)
+{
+    if (a == b) {
+        return true;
+    }
+    if (a == NULL || b == NULL) {
+        return false;
+    }
+    if (a->width != b->width || a->height != b->height) {
+        return false;
+    }
+
+    size_t count = (size_t)a->width * (size_t)a->height;
+    return memcmp(a->cells, b->cells, count) == 0;
+}
+
+unsigned long grid_hash(const grid *g)
+{
+    if (g == NULL) {
+        return 0;
+    }
+
+    unsigned long hash = 1469598103934665603UL;
+    size_t count = (size_t)g->width * (size_t)g->height;
+    for (size_t i = 0; i < count; ++i) {
+        hash ^= g->cells[i];
+        hash *= 1099511628211UL;
+    }
+    return hash;
+}
