@@ -38,3 +38,11 @@ int life_count_neighbors(const grid *g, int x, int y, bool wrap)
     return count;
 }
 
+bool life_next_state(bool alive, int neighbors)
+{
+    if (alive) {
+        return neighbors == 2 || neighbors == 3;
+    }
+    return neighbors == 3;
+}
+
