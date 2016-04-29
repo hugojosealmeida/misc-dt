@@ -46,3 +46,14 @@ bool life_next_state(bool alive, int neighbors)
     return neighbors == 3;
 }
 
+void life_step(const grid *current, grid *next, bool wrap)
+{
+    for (int y = 0; y < current->height; ++y) {
+        for (int x = 0; x < current->width; ++x) {
+            int neighbors = life_count_neighbors(current, x, y, wrap);
+            bool alive = grid_get(current, x, y);
+            grid_set(next, x, y, life_next_state(alive, neighbors));
+        }
+    }
+}
+
