@@ -57,3 +57,32 @@ void life_step(const grid *current, grid *next, bool wrap)
     }
 }
 
+int life_run(grid *g, int generations, bool wrap, life_observer observer,
+             void *context)
+{
+    if (g == NULL || generations < 0) {
+        return -1;
+    }
+    if (generations == 0) {
+        return 0;
+    }
+
+    grid *scratch = grid_create(g->width, g->height);
+    if (scratch == NULL) {
+        return -1;
+    }
+
+    for (int generation = 1; generation <= generations; ++generation) {
+        life_step(g, scratch, wrap);
+        if (!grid_copy(g, scratch)) {
+            grid_destroy(scratch);
+            return -1;
+        }
+        if (observer != NULL) {
+            observer(g, generation, context);
+        }
+    }
+
+    grid_destroy(scratch);
+    return generations;
+}
