@@ -6,3 +6,31 @@
 #include <stdio.h>
 #include <string.h>
 
+TEST(grid_create_reports_dimensions)
+{
+    grid *g = grid_create(4, 3);
+    CHECK(g != NULL);
+    CHECK_INT(g->width, 4);
+    CHECK_INT(g->height, 3);
+    CHECK_INT(grid_count_alive(g), 0);
+    grid_destroy(g);
+}
+
+TEST(grid_create_rejects_invalid_dimensions)
+{
+    CHECK(grid_create(0, 4) == NULL);
+    CHECK(grid_create(4, 0) == NULL);
+    CHECK(grid_create(-1, 4) == NULL);
+}
+
+TEST(grid_clear_removes_every_cell)
+{
+    grid *g = grid_create(3, 3);
+    CHECK(g != NULL);
+    CHECK(grid_set(g, 0, 0, true));
+    CHECK(grid_set(g, 2, 2, true));
+    grid_clear(g);
+    CHECK_INT(grid_count_alive(g), 0);
+    grid_destroy(g);
+}
+
