@@ -67,3 +67,52 @@ TEST(grid_access_rejects_out_of_bounds)
     grid_destroy(g);
 }
 
+TEST(grid_count_alive_counts_every_live_cell)
+{
+    grid *g = grid_create(3, 3);
+    CHECK(g != NULL);
+
+    CHECK(grid_set(g, 0, 0, true));
+    CHECK(grid_set(g, 1, 1, true));
+    CHECK(grid_set(g, 2, 2, true));
+    CHECK_INT(grid_count_alive(g), 3);
+    CHECK_INT(grid_count_alive(NULL), 0);
+
+    grid_destroy(g);
+}
+
+TEST(grid_copy_duplicates_the_buffer)
+{
+    grid *source = grid_create(2, 2);
+    grid *target = grid_create(2, 2);
+    CHECK(source != NULL);
+    CHECK(target != NULL);
+
+    CHECK(grid_set(source, 0, 1, true));
+    CHECK(grid_copy(target, source));
+    CHECK(grid_equals(source, target));
+    CHECK_INT(grid_hash(source), grid_hash(target));
+
+    grid_destroy(source);
+    grid_destroy(target);
+}
+
+TEST(grid_equals_compares_dimensions_and_cells)
+{
+    grid *a = grid_create(2, 2);
+    grid *b = grid_create(2, 2);
+    grid *c = grid_create(3, 2);
+    CHECK(a != NULL);
+    CHECK(b != NULL);
+    CHECK(c != NULL);
+
+    CHECK(grid_equals(a, b));
+    CHECK(!grid_equals(a, c));
+    CHECK(grid_set(a, 1, 0, true));
+    CHECK(!grid_equals(a, b));
+
+    grid_destroy(a);
+    grid_destroy(b);
+    grid_destroy(c);
+}
+
