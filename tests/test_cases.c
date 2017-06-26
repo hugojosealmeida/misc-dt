@@ -116,3 +116,46 @@ TEST(grid_equals_compares_dimensions_and_cells)
     grid_destroy(c);
 }
 
+TEST(life_counts_eight_neighbors_in_a_block)
+{
+    grid *g = grid_create(3, 3);
+    CHECK(g != NULL);
+
+    for (int y = 0; y < 3; ++y) {
+        for (int x = 0; x < 3; ++x) {
+            CHECK(grid_set(g, x, y, true));
+        }
+    }
+
+    CHECK_INT(life_count_neighbors(g, 1, 1, false), 8);
+    CHECK_INT(life_count_neighbors(g, 1, 1, true), 8);
+
+    grid_destroy(g);
+}
+
+TEST(life_ignores_missing_neighbors_without_wrapping)
+{
+    grid *g = grid_create(3, 3);
+    CHECK(g != NULL);
+    CHECK(grid_set(g, 0, 0, true));
+    CHECK(grid_set(g, 1, 0, true));
+
+    CHECK_INT(life_count_neighbors(g, 0, 0, false), 1);
+    CHECK_INT(life_count_neighbors(g, 2, 2, false), 0);
+
+    grid_destroy(g);
+}
+
+TEST(life_wraps_neighbors_around_the_edges)
+{
+    grid *g = grid_create(4, 4);
+    CHECK(g != NULL);
+    CHECK(grid_set(g, 0, 0, true));
+    CHECK(grid_set(g, 3, 3, true));
+
+    CHECK_INT(life_count_neighbors(g, 0, 0, true), 1);
+    CHECK_INT(life_count_neighbors(g, 0, 0, false), 0);
+
+    grid_destroy(g);
+}
+
