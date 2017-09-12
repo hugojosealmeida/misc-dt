@@ -159,3 +159,18 @@ TEST(life_wraps_neighbors_around_the_edges)
     grid_destroy(g);
 }
 
+TEST(life_applies_the_b3s23_rule_table)
+{
+    CHECK(life_next_state(true, 0) == false);
+    CHECK(life_next_state(true, 1) == false);
+    CHECK(life_next_state(true, 2) == true);
+    CHECK(life_next_state(true, 3) == true);
+    CHECK(life_next_state(true, 4) == false);
+    CHECK(life_next_state(true, 8) == false);
+
+    CHECK(life_next_state(false, 0) == false);
+    CHECK(life_next_state(false, 2) == false);
+    CHECK(life_next_state(false, 3) == true);
+    CHECK(life_next_state(false, 4) == false);
+}
+
