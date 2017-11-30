@@ -174,3 +174,45 @@ TEST(life_applies_the_b3s23_rule_table)
     CHECK(life_next_state(false, 4) == false);
 }
 
+TEST(life_step_turns_a_blinker_into_a_vertical_bar)
+{
+    grid *current = grid_create(5, 5);
+    grid *next = grid_create(5, 5);
+    CHECK(current != NULL);
+    CHECK(next != NULL);
+
+    CHECK(grid_set(current, 1, 2, true));
+    CHECK(grid_set(current, 2, 2, true));
+    CHECK(grid_set(current, 3, 2, true));
+
+    life_step(current, next, false);
+
+    CHECK(grid_get(next, 2, 1));
+    CHECK(grid_get(next, 2, 2));
+    CHECK(grid_get(next, 2, 3));
+    CHECK_INT(grid_count_alive(next), 3);
+
+    grid_destroy(current);
+    grid_destroy(next);
+}
+
+TEST(life_step_keeps_a_block_alive)
+{
+    grid *current = grid_create(4, 4);
+    grid *next = grid_create(4, 4);
+    CHECK(current != NULL);
+    CHECK(next != NULL);
+
+    CHECK(grid_set(current, 1, 1, true));
+    CHECK(grid_set(current, 2, 1, true));
+    CHECK(grid_set(current, 1, 2, true));
+    CHECK(grid_set(current, 2, 2, true));
+
+    life_step(current, next, false);
+
+    CHECK(grid_equals(current, next));
+
+    grid_destroy(current);
+    grid_destroy(next);
+}
+
