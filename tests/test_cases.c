@@ -216,3 +216,40 @@ TEST(life_step_keeps_a_block_alive)
     grid_destroy(next);
 }
 
+static int observed_generations;
+
+static void count_generation(const grid *g, int generation, void *context)
+{
+    (void)g;
+    (void)context;
+    observed_generations = generation;
+}
+
+TEST(life_run_advances_the_requested_number_of_generations)
+{
+    grid *g = grid_create(5, 5);
+    CHECK(g != NULL);
+    CHECK(grid_set(g, 1, 2, true));
+    CHECK(grid_set(g, 2, 2, true));
+    CHECK(grid_set(g, 3, 2, true));
+
+    observed_generations = 0;
+    CHECK_INT(life_run(g, 2, false, count_generation, NULL), 2);
+    CHECK_INT(observed_generations, 2);
+    CHECK_INT(grid_count_alive(g), 3);
+
+    grid_destroy(g);
+}
+
+TEST(life_run_handles_zero_and_invalid_input)
+{
+    grid *g = grid_create(3, 3);
+    CHECK(g != NULL);
+
+    CHECK_INT(life_run(g, 0, false, NULL, NULL), 0);
+    CHECK_INT(life_run(NULL, 1, false, NULL, NULL), -1);
+    CHECK_INT(life_run(g, -1, false, NULL, NULL), -1);
+
+    grid_destroy(g);
+}
+
