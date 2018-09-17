@@ -253,3 +253,28 @@ TEST(life_run_handles_zero_and_invalid_input)
     grid_destroy(g);
 }
 
+#include "io.h"
+
+TEST(io_render_ascii_writes_the_expected_rows)
+{
+    grid *g = grid_create(3, 2);
+    CHECK(g != NULL);
+    CHECK(grid_set(g, 0, 0, true));
+    CHECK(grid_set(g, 2, 0, true));
+    CHECK(grid_set(g, 1, 1, true));
+
+    FILE *out = tmpfile();
+    CHECK(out != NULL);
+    io_render_ascii(g, out);
+    rewind(out);
+
+    char buffer[32];
+    CHECK(fgets(buffer, sizeof buffer, out) != NULL);
+    CHECK(strcmp(buffer, "#.#\n") == 0);
+    CHECK(fgets(buffer, sizeof buffer, out) != NULL);
+    CHECK(strcmp(buffer, ".#.\n") == 0);
+
+    fclose(out);
+    grid_destroy(g);
+}
+
