@@ -16,3 +16,36 @@ static bool dead_char(int ch)
     return ch == '.' || ch == ' ';
 }
 
+bool pattern_load_plain(grid *g, FILE *in, int offset_x, int offset_y)
+{
+    if (g == NULL || in == NULL) {
+        return false;
+    }
+
+    char line[PATTERN_MAX_LINE];
+    int row = 0;
+
+    while (fgets(line, sizeof line, in) != NULL) {
+        if (line[0] == '!' || line[0] == '\n' || line[0] == '\r') {
+            continue;
+        }
+
+        int column = 0;
+        for (const char *cursor = line; *cursor != '\0'; ++cursor) {
+            unsigned char ch = (unsigned char)*cursor;
+            if (ch == '\n' || ch == '\r') {
+                break;
+            }
+            if (alive_char(ch)) {
+                grid_set(g, offset_x + column, offset_y + row, true);
+            } else if (!dead_char(ch)) {
+                return false;
+            }
+            ++column;
+        }
+        ++row;
+    }
+
+    return true;
+}
+
