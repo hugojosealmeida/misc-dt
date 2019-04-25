@@ -49,3 +49,20 @@ bool pattern_load_plain(grid *g, FILE *in, int offset_x, int offset_y)
     return true;
 }
 
+bool pattern_save_plain(const grid *g, FILE *out)
+{
+    if (g == NULL || out == NULL) {
+        return false;
+    }
+
+    fprintf(out, "!Game of Life pattern, %dx%d\n", g->width, g->height);
+    for (int y = 0; y < g->height; ++y) {
+        for (int x = 0; x < g->width; ++x) {
+            fputc(grid_get(g, x, y) ? 'O' : '.', out);
+        }
+        fputc('\n', out);
+    }
+
+    return !ferror(out);
+}
+
