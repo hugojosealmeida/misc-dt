@@ -278,3 +278,25 @@ TEST(io_render_ascii_writes_the_expected_rows)
     grid_destroy(g);
 }
 
+#include "pattern.h"
+
+TEST(pattern_load_plain_parses_cells_and_comments)
+{
+    grid *g = grid_create(5, 5);
+    CHECK(g != NULL);
+
+    FILE *in = tmpfile();
+    CHECK(in != NULL);
+    fputs("!glider\n.O.\n..O\nOOO\n", in);
+    rewind(in);
+
+    CHECK(pattern_load_plain(g, in, 1, 1));
+    CHECK_INT(grid_count_alive(g), 5);
+    CHECK(grid_get(g, 2, 1));
+    CHECK(grid_get(g, 3, 2));
+    CHECK(grid_get(g, 1, 3));
+
+    fclose(in);
+    grid_destroy(g);
+}
+
