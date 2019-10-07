@@ -66,3 +66,91 @@ bool pattern_save_plain(const grid *g, FILE *out)
     return !ferror(out);
 }
 
+static bool parse_rle_header(const char *line, int *width, int *height)
+{
+    int parsed_width = 0;
+    int parsed_height = 0;
+
+    if (sscanf(line, "x = %d , y = %d", &parsed_width, &parsed_height) != 2
+        && sscanf(line, "x=%d,y=%d", &parsed_width, &parsed_height) != 2) {
+        return false;
+    }
+
+    if (width != NULL) {
+        *width = parsed_width;
+    }
+    if (height != NULL) {
+        *height = parsed_height;
+    }
+    return true;
+}
+
+bool pattern_load_rle(grid *g, FILE *in, int offset_x, int offset_y)
+{
+    if (g == NULL || in == NULL) {
+        return false;
+    }
+
+    char line[PATTERN_MAX_LINE];
+    bool header_seen = false;
+
+    while (fgets(line, sizeof line, in) != NULL) {
+        if (line[0] == '#') {
+            continue;
+        }
+        if (!header_seen) {
+            if (!parse_rle_header(line, NULL, NULL)) {
+                return false;
+            }
+            header_seen = true;
+            break;
+        }
+    }
+
+    if (!header_seen) {
+        return false;
+    }
+
+    long column = 0;
+    long row = 0;
+    long run = 0;
+    int ch;
+
+    while ((ch = fgetc(in)) != EOF) {
+        if (ch == '\n' || ch == '\r' || ch == ' ' || ch == '\t') {
+            continue;
+        }
+        if (ch >= '0' && ch <= '9') {
+            run = run * 10 + (ch - '0');
+            continue;
+        }
+        if (run == 0) {
+            run = 1;
+        }
+
+        switch (ch) {
+        case 'b':
+            column += run;
+            break;
+        case 'o':
+            for (long i = 0; i < run; ++i) {
+                grid_set(g, offset_x + (int)column + (int)i,
+                         offset_y + (int)row, true);
+            }
+            column += run;
+            break;
+        case '$':
+            row += run;
+            column = 0;
+            break;
+        case '!':
+            return true;
+        default:
+            return false;
+        }
+        run = 0;
+    }
+
+    return true;
+}
+
