@@ -300,3 +300,39 @@ TEST(pattern_load_plain_parses_cells_and_comments)
     grid_destroy(g);
 }
 
+TEST(pattern_load_rle_expands_runs)
+{
+    grid *g = grid_create(6, 4);
+    CHECK(g != NULL);
+
+    FILE *in = tmpfile();
+    CHECK(in != NULL);
+    fputs("#N glider\nx = 3, y = 3, rule = B3/S23\nbo$2bo$3o!\n", in);
+    rewind(in);
+
+    CHECK(pattern_load_rle(g, in, 1, 0));
+    CHECK_INT(grid_count_alive(g), 5);
+    CHECK(grid_get(g, 2, 0));
+    CHECK(grid_get(g, 3, 1));
+    CHECK(grid_get(g, 1, 2));
+
+    fclose(in);
+    grid_destroy(g);
+}
+
+TEST(pattern_rle_rejects_a_missing_header)
+{
+    grid *g = grid_create(4, 4);
+    CHECK(g != NULL);
+
+    FILE *in = tmpfile();
+    CHECK(in != NULL);
+    fputs("bo$2bo!\n", in);
+    rewind(in);
+
+    CHECK(!pattern_load_rle(g, in, 0, 0));
+
+    fclose(in);
+    grid_destroy(g);
+}
+
