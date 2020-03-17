@@ -154,3 +154,26 @@ bool pattern_load_rle(grid *g, FILE *in, int offset_x, int offset_y)
     return true;
 }
 
+static bool has_rle_extension(const char *path)
+{
+    size_t length = strlen(path);
+    return length >= 4 && strcmp(path + length - 4, ".rle") == 0;
+}
+
+bool pattern_load_file(grid *g, const char *path, int offset_x, int offset_y)
+{
+    if (g == NULL || path == NULL) {
+        return false;
+    }
+
+    FILE *in = fopen(path, "r");
+    if (in == NULL) {
+        return false;
+    }
+
+    bool ok = has_rle_extension(path)
+                  ? pattern_load_rle(g, in, offset_x, offset_y)
+                  : pattern_load_plain(g, in, offset_x, offset_y);
+    fclose(in);
+    return ok;
+}
