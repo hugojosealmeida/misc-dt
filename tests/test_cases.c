@@ -336,3 +336,27 @@ TEST(pattern_rle_rejects_a_missing_header)
     grid_destroy(g);
 }
 
+TEST(pattern_save_plain_writes_a_readable_grid)
+{
+    grid *g = grid_create(2, 2);
+    CHECK(g != NULL);
+    CHECK(grid_set(g, 0, 0, true));
+    CHECK(grid_set(g, 1, 1, true));
+
+    FILE *out = tmpfile();
+    CHECK(out != NULL);
+    CHECK(pattern_save_plain(g, out));
+    rewind(out);
+
+    char buffer[64];
+    CHECK(fgets(buffer, sizeof buffer, out) != NULL);
+    CHECK(strncmp(buffer, "!Game of Life", 13) == 0);
+    CHECK(fgets(buffer, sizeof buffer, out) != NULL);
+    CHECK(strcmp(buffer, "O.\n") == 0);
+    CHECK(fgets(buffer, sizeof buffer, out) != NULL);
+    CHECK(strcmp(buffer, ".O\n") == 0);
+
+    fclose(out);
+    grid_destroy(g);
+}
+
