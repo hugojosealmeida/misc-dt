@@ -164,3 +164,32 @@ bool cli_parse(int argc, char **argv, life_options *opts, char *error,
     return true;
 }
 
+void cli_print_usage(FILE *out, const char *program)
+{
+    fprintf(out,
+            "Usage: %s [options] [pattern]\n"
+            "\n"
+            "Simulate Conway's Game of Life on a fixed grid.\n"
+            "\n"
+            "Options:\n"
+            "  -w, --width N          grid width (default 40)\n"
+            "  -H, --height N         grid height (default 20)\n"
+            "  -g, --generations N    number of generations (default 100)\n"
+            "  -d, --delay MS         delay between frames in milliseconds\n"
+            "  -x, --offset-x N       pattern offset on the x axis\n"
+            "  -y, --offset-y N       pattern offset on the y axis\n"
+            "      --seed N           seed for the random soup (default 1)\n"
+            "      --wrap             wrap cells around the grid edges\n"
+            "      --ascii            render a single plain text frame\n"
+            "      --stats            print generation statistics\n"
+            "  -p, --pattern PATH     load a pattern from a file\n"
+            "  -o, --output PATH      write the final grid to a file\n"
+            "  -h, --help             show this help text\n"
+            "  -v, --version          show the version\n",
+            program);
+}
+
+void cli_print_version(FILE *out)
+{
+    fprintf(out, "life 1.0.0\n");
+}
