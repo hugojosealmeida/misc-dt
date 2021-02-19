@@ -360,3 +360,51 @@ TEST(pattern_save_plain_writes_a_readable_grid)
     grid_destroy(g);
 }
 
+#include "cli.h"
+
+TEST(cli_parse_keeps_the_documented_defaults)
+{
+    life_options options;
+    cli_options_init(&options);
+    CHECK_INT(options.width, 40);
+    CHECK_INT(options.height, 20);
+    CHECK_INT(options.generations, 100);
+    CHECK(options.ansi);
+    CHECK(!options.wrap);
+}
+
+TEST(cli_parse_reads_flags_and_values)
+{
+    char *argv[] = {"life",     "--width", "12", "-H",   "8",
+                    "--wrap",   "--seed",  "42", "-g",   "5",
+                    "--ascii",  "--stats", "glider.txt"};
+    life_options options;
+    cli_options_init(&options);
+
+    char error[128] = "";
+    CHECK(cli_parse(13, argv, &options, error, sizeof error));
+    CHECK_INT(options.width, 12);
+    CHECK_INT(options.height, 8);
+    CHECK_INT(options.generations, 5);
+    CHECK_INT(options.seed, 42);
+    CHECK(options.wrap);
+    CHECK(!options.ansi);
+    CHECK(options.stats);
+    CHECK(strcmp(options.pattern_path, "glider.txt") == 0);
+}
+
+TEST(cli_parse_rejects_bad_input)
+{
+    char *unknown[] = {"life", "--bogus"};
+    char *missing[] = {"life", "--width"};
+    char *invalid[] = {"life", "--width", "wide"};
+    life_options options;
+    char error[128];
+
+    cli_options_init(&options);
+    CHECK(!cli_parse(2, unknown, &options, error, sizeof error));
+    cli_options_init(&options);
+    CHECK(!cli_parse(2, missing, &options, error, sizeof error));
+    cli_options_init(&options);
+    CHECK(!cli_parse(3, invalid, &options, error, sizeof error));
+}
