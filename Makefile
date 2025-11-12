@@ -28,3 +28,11 @@ test: $(TEST_BIN)
 clean:
 	rm -rf build
 
+SANITIZE_FLAGS := -std=c11 -g -O1 -fsanitize=address,undefined -fno-omit-frame-pointer
+
+.PHONY: sanitize
+sanitize:
+	@mkdir -p build
+	$(CC) $(CPPFLAGS) $(SANITIZE_FLAGS) -o build/test_san $(TEST_SRC) $(LDFLAGS)
+	./build/test_san
+
