@@ -36,3 +36,8 @@ sanitize:
 	$(CC) $(CPPFLAGS) $(SANITIZE_FLAGS) -o build/test_san $(TEST_SRC) $(LDFLAGS)
 	./build/test_san
 
+.PHONY: coverage
+coverage:
+	@mkdir -p build/coverage
+	$(CC) $(CPPFLAGS) -std=c11 -g -O0 --coverage -o build/coverage/test_cov $(TEST_SRC) $(LDFLAGS)
+	./build/coverage/test_cov
